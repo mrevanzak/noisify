@@ -17,6 +17,7 @@ import {
   Group,
   Paint,
   Skia,
+  TileMode,
   rect,
   rrect,
 } from "@shopify/react-native-skia";
@@ -30,21 +31,69 @@ const SCREEN_HEIGHT = Dimensions.get("screen").height;
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.8;
 const SHAPE_HEIGHT = (4 / 3) * SHAPE_WIDTH;
 
-const invertColorsFilter = Skia.RuntimeEffect.Make(`
-  uniform shader image;
+const grainyShader = Skia.RuntimeEffect.Make(`
+  uniform shader image; // Input image
+  uniform float noiseStrength; // Control for noise intensity
+  uniform vec2 resolution; // Screen resolution
+  uniform float time; // Time for animated noise
+
+  // Random function to generate pseudo-random values
+  float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+  }
+
+  /*
+    by @arthurstammet
+    https://shadertoy.com/view/tdXXRM
+  */
+  float tvNoise(vec2 p, float ta, float tb) {
+    return fract(sin(p.x * ta + p.y * tb) * 5678.0);
+  }
+
   half4 main(vec2 pos) {
+    // Get the color of the image at the current position
     vec4 color = image.eval(pos);
-    return vec4((1.0 - color).rgb, 1.0);
+    
+    // Normalize position to resolution
+    vec2 st = pos / resolution;
+
+    // Time-based values for animated noise
+    float t = time + 123.0;
+    float ta = t * 0.654321;
+    float tb = t * (ta * 0.123456);
+
+    // Generate grain/noise value
+    vec4 noise = vec4(1. - tvNoise(st, ta, tb));
+
+    // Blend noise with the image color
+    vec3 grainyColor = color.rgb + noiseStrength * noise.rgb;
+
+    // Return the final color (with alpha retained)
+    return vec4(grainyColor, color.a);
   }
 `);
-const shaderBuilder = Skia.RuntimeShaderBuilder(invertColorsFilter!);
-const imageFilter = Skia.ImageFilter.MakeRuntimeShader(
+
+if (!grainyShader) {
+  throw new Error("Couldn't compile the shader");
+}
+const shaderBuilder = Skia.RuntimeShaderBuilder(grainyShader);
+shaderBuilder.setUniform("resolution", [SCREEN_WIDTH, SCREEN_HEIGHT]); // Set the resolution to the screen size
+shaderBuilder.setUniform("noiseStrength", [0.8]); // Set the noise strength
+shaderBuilder.setUniform("time", [100 * Math.random()]); // Set the time for the animated noise
+const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
   shaderBuilder,
   null,
   null,
 );
+
+const grainyBlurImageFilter = Skia.ImageFilter.MakeBlur(
+  40,
+  40,
+  TileMode.Repeat,
+  grainyFilter,
+);
 const paint = Skia.Paint();
-paint.setImageFilter(imageFilter);
+paint.setImageFilter(grainyBlurImageFilter);
 
 export default function Homescreen() {
   const [camera, setCamera] = useState<CameraPosition>("back");
