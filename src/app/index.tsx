@@ -28,26 +28,38 @@ import { useDoubleTapGesture } from "@/hooks/useDoubleTapGesture";
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
-const SHAPE_WIDTH = SCREEN_WIDTH * 0.8;
-const SHAPE_HEIGHT = (4 / 3) * SHAPE_WIDTH;
+const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
+const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
 
 const grainyShader = Skia.RuntimeEffect.Make(`
   uniform shader image; // Input image
   uniform float noiseStrength; // Control for noise intensity
   uniform vec2 resolution; // Screen resolution
   uniform float time; // Time for animated noise
+  uniform float saturation; // Saturation factor
 
   // Random function to generate pseudo-random values
   float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
   }
 
-  /*
-    by @arthurstammet
-    https://shadertoy.com/view/tdXXRM
+  /**
+  * @author @arthurstammet
+  * https://shadertoy.com/view/tdXXRM
   */
   float tvNoise(vec2 p, float ta, float tb) {
     return fract(sin(p.x * ta + p.y * tb) * 5678.0);
+  }
+
+  /**
+  * Adjusts the saturation of a color.
+  *
+  * https://github.com/minus34/cesium1/blob/master/Cesium/Shaders/Builtin/Functions/saturation.glsl
+  */
+  vec3 adjustSaturation(vec3 color, float saturation) {
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+    vec3 intensity = vec3(dot(color, W));
+    return mix(intensity, color, saturation);
   }
 
   half4 main(vec2 pos) {
@@ -68,8 +80,11 @@ const grainyShader = Skia.RuntimeEffect.Make(`
     // Blend noise with the image color
     vec3 grainyColor = color.rgb + noiseStrength * noise.rgb;
 
+    // Adjust the saturation of the image
+    vec3 finalColor = adjustSaturation(grainyColor, saturation);
+
     // Return the final color (with alpha retained)
-    return vec4(grainyColor, color.a);
+    return vec4(finalColor, color.a);
   }
 `);
 
@@ -80,6 +95,7 @@ const shaderBuilder = Skia.RuntimeShaderBuilder(grainyShader);
 shaderBuilder.setUniform("resolution", [SCREEN_WIDTH, SCREEN_HEIGHT]); // Set the resolution to the screen size
 shaderBuilder.setUniform("noiseStrength", [0.4]); // Set the noise strength
 shaderBuilder.setUniform("time", [100 * Math.random()]); // Set the time for the animated noise
+shaderBuilder.setUniform("saturation", [1.4]); // Set the saturation factor
 const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
   shaderBuilder,
   null,
@@ -87,8 +103,8 @@ const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
 );
 
 const grainyBlurImageFilter = Skia.ImageFilter.MakeBlur(
-  100,
-  100,
+  60,
+  60,
   TileMode.Repeat,
   grainyFilter,
 );
@@ -159,7 +175,7 @@ export default function Homescreen() {
             invertClip={true}
             layer={
               <Paint>
-                <Blur blur={20} />
+                <Blur blur={50} />
               </Paint>
             }
           >
