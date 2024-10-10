@@ -4,6 +4,7 @@ import {
   CameraPosition,
   useCameraDevice,
   useCameraPermission,
+  useSkiaFrameProcessor,
 } from "react-native-vision-camera";
 import { Camera } from "@/components/Camera";
 import { Dimensions, StyleSheet } from "react-native";
@@ -15,6 +16,7 @@ import {
   Fill,
   Group,
   Paint,
+  Skia,
   rect,
   rrect,
 } from "@shopify/react-native-skia";
@@ -27,6 +29,22 @@ const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.8;
 const SHAPE_HEIGHT = (4 / 3) * SHAPE_WIDTH;
+
+const invertColorsFilter = Skia.RuntimeEffect.Make(`
+  uniform shader image;
+  half4 main(vec2 pos) {
+    vec4 color = image.eval(pos);
+    return vec4((1.0 - color).rgb, 1.0);
+  }
+`);
+const shaderBuilder = Skia.RuntimeShaderBuilder(invertColorsFilter!);
+const imageFilter = Skia.ImageFilter.MakeRuntimeShader(
+  shaderBuilder,
+  null,
+  null,
+);
+const paint = Skia.Paint();
+paint.setImageFilter(imageFilter);
 
 export default function Homescreen() {
   const [camera, setCamera] = useState<CameraPosition>("back");
@@ -56,6 +74,11 @@ export default function Homescreen() {
     SHAPE_WIDTH,
   );
 
+  const frameProcessor = useSkiaFrameProcessor((frame) => {
+    "worklet";
+    frame.render(paint);
+  }, []);
+
   return (
     <GestureDetector gesture={gestures}>
       <ThemedView
@@ -73,7 +96,11 @@ export default function Homescreen() {
             <ThemedText>Camera not available</ThemedText>
           ))
           .with([true, P.not(P.nullish)], ([_, device]) => (
-            <Camera device={device} zoom={zoom} />
+            <Camera
+              device={device}
+              zoom={zoom}
+              frameProcessor={frameProcessor}
+            />
           ))
           .exhaustive()}
 
