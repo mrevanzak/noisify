@@ -78,7 +78,7 @@ if (!grainyShader) {
 }
 const shaderBuilder = Skia.RuntimeShaderBuilder(grainyShader);
 shaderBuilder.setUniform("resolution", [SCREEN_WIDTH, SCREEN_HEIGHT]); // Set the resolution to the screen size
-shaderBuilder.setUniform("noiseStrength", [0.8]); // Set the noise strength
+shaderBuilder.setUniform("noiseStrength", [0.4]); // Set the noise strength
 shaderBuilder.setUniform("time", [100 * Math.random()]); // Set the time for the animated noise
 const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
   shaderBuilder,
@@ -87,8 +87,8 @@ const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
 );
 
 const grainyBlurImageFilter = Skia.ImageFilter.MakeBlur(
-  40,
-  40,
+  100,
+  100,
   TileMode.Repeat,
   grainyFilter,
 );
