@@ -7,7 +7,7 @@ import {
 } from "react-native-vision-camera";
 import * as MediaLibrary from "expo-media-library";
 import { Camera } from "@/components/Camera";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { P, match } from "ts-pattern";
 import { useRef, useState } from "react";
 import {
@@ -25,25 +25,28 @@ import { useDoubleTapGesture } from "@/hooks/useDoubleTapGesture";
 import { ControlCenter } from "@/components/ControlCenter";
 import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import { useSwipeUpGesture } from "@/hooks/useSwipeUpGesture";
-import Animated, {
+import {
   useDerivedValue,
   withTiming,
   useSharedValue,
   LinearTransition,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
+import {
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  TouchableOpacity,
+} from "@gorhom/bottom-sheet";
 import { paint } from "@/assets/shaders";
 import { Feather } from "@expo/vector-icons";
 import { usePermissions } from "@/hooks/usePermissions";
 import { captureRef } from "react-native-view-shot";
 import { toast } from "@baronha/ting";
 import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
+import { AnimatedButton } from "@/components/AnimatedButton";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function Homescreen() {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -197,8 +200,7 @@ export default function Homescreen() {
               gap: 16,
             }}
           >
-            <AnimatedPressable
-              layout={LinearTransition}
+            <AnimatedButton
               style={{
                 backgroundColor: "black",
                 padding: 16,
@@ -207,9 +209,9 @@ export default function Homescreen() {
               onPress={onStartPress}
             >
               <Feather name="corner-up-left" size={24} color="white" />
-            </AnimatedPressable>
+            </AnimatedButton>
 
-            <AnimatedPressable
+            <AnimatedButton
               style={{
                 backgroundColor: "black",
                 padding: 16,
@@ -218,10 +220,11 @@ export default function Homescreen() {
               onPress={onShutterPress}
             >
               <ThemedText>📸</ThemedText>
-            </AnimatedPressable>
+            </AnimatedButton>
           </ThemedView>
         ) : (
-          <AnimatedPressable
+          <AnimatedButton
+            layout={LinearTransition}
             style={{
               width: "80%",
               position: "absolute",
@@ -236,7 +239,7 @@ export default function Homescreen() {
             <ThemedText style={{ textAlign: "center" }}>
               ✨ Start the Experience
             </ThemedText>
-          </AnimatedPressable>
+          </AnimatedButton>
         )}
 
         <ControlCenter ref={controllCenterRef} />
