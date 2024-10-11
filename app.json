@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "hue-lens",
-    "slug": "hue-lens",
+    "name": "Noisify",
+    "slug": "noisify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "hue-lens",
+    "scheme": "noisify",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./src/assets/images/splash.png",
@@ -17,7 +17,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
       },
-      "bundleIdentifier": "com.mrevanzak.huelens"
+      "bundleIdentifier": "com.mrevanzak.noisify"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +31,7 @@
         "android.permission.ACCESS_MEDIA_LOCATION",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.mrevanzak.huelens"
+      "package": "com.mrevanzak.noisify"
     },
     "web": {
       "bundler": "metro",
@@ -61,7 +61,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "4548f797-7106-4030-b88f-6a259230b2b6"
+        "projectId": "e38fc18c-87a3-4d30-bd21-4705a3df83f2"
       }
     },
     "runtimeVersion": {
