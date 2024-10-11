@@ -7,5 +7,5 @@ export function useDoubleTapGesture(handler: () => void) {
     .numberOfTaps(2)
     .onStart(() => runOnJS(handler)());
 
-  return { gesture: doubleTapGesture };
+  return doubleTapGesture;
 }

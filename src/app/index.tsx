@@ -9,7 +9,7 @@ import {
 import { Camera } from "@/components/Camera";
 import { Dimensions, StyleSheet } from "react-native";
 import { P, match } from "ts-pattern";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Blur,
   Canvas,
@@ -24,6 +24,9 @@ import {
 import { useZoomGesture } from "@/hooks/useZoomGesture";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useDoubleTapGesture } from "@/hooks/useDoubleTapGesture";
+import { ControlCenter } from "@/components/ControlCenter";
+import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
+import { useSwipeUpGesture } from "@/hooks/useSwipeUpGesture";
 
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
@@ -108,6 +111,8 @@ const paint = Skia.Paint();
 paint.setImageFilter(grainyBlurFilter);
 
 export default function Homescreen() {
+  const controllCenterRef = useRef<BottomSheet>(null);
+
   const [camera, setCamera] = useState<CameraPosition>("back");
   const device = useCameraDevice(camera);
 
@@ -119,10 +124,13 @@ export default function Homescreen() {
   }, []);
 
   const { gesture: zoomGesture, zoom } = useZoomGesture();
-  const { gesture: doubleTapGesture } = useDoubleTapGesture(() => {
+  const doubleTapGesture = useDoubleTapGesture(() => {
     setCamera((camera) => (camera === "back" ? "front" : "back"));
   });
-  const gestures = Gesture.Race(zoomGesture, doubleTapGesture);
+  const swipeUpGesture = useSwipeUpGesture(() => {
+    controllCenterRef.current?.expand();
+  });
+  const gestures = Gesture.Race(swipeUpGesture, zoomGesture, doubleTapGesture);
 
   const ovalRect = rrect(
     rect(
@@ -180,17 +188,18 @@ export default function Homescreen() {
         </Canvas>
 
         <ThemedText
-          type="title"
           style={{
-            fontFamily: "PlayfairDisplay_500Medium",
             textAlign: "center",
             fontSize: 40,
+            lineHeight: 36,
             marginHorizontal: 32,
             color: "black",
           }}
         >
-          Turn moments into mesmerizing grainy gradients
+          Turn Moments into Mesmerizing Grainy Gradients
         </ThemedText>
+
+        <ControlCenter ref={controllCenterRef} />
       </ThemedView>
     </GestureDetector>
   );
