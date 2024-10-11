@@ -93,23 +93,19 @@ if (!grainyShader) {
 }
 const shaderBuilder = Skia.RuntimeShaderBuilder(grainyShader);
 shaderBuilder.setUniform("resolution", [SCREEN_WIDTH, SCREEN_HEIGHT]); // Set the resolution to the screen size
-shaderBuilder.setUniform("noiseStrength", [0.4]); // Set the noise strength
+shaderBuilder.setUniform("noiseStrength", [0.15]); // Set the noise strength
 shaderBuilder.setUniform("time", [100 * Math.random()]); // Set the time for the animated noise
 shaderBuilder.setUniform("saturation", [1.4]); // Set the saturation factor
-const grainyFilter = Skia.ImageFilter.MakeRuntimeShader(
+
+const blurFilter = Skia.ImageFilter.MakeBlur(60, 60, TileMode.Repeat, null);
+const grainyBlurFilter = Skia.ImageFilter.MakeRuntimeShader(
   shaderBuilder,
   null,
-  null,
+  blurFilter,
 );
 
-const grainyBlurImageFilter = Skia.ImageFilter.MakeBlur(
-  60,
-  60,
-  TileMode.Repeat,
-  grainyFilter,
-);
 const paint = Skia.Paint();
-paint.setImageFilter(grainyBlurImageFilter);
+paint.setImageFilter(grainyBlurFilter);
 
 export default function Homescreen() {
   const [camera, setCamera] = useState<CameraPosition>("back");
@@ -182,6 +178,19 @@ export default function Homescreen() {
             <Fill color="white" />
           </Group>
         </Canvas>
+
+        <ThemedText
+          type="title"
+          style={{
+            fontFamily: "PlayfairDisplay_500Medium",
+            textAlign: "center",
+            fontSize: 40,
+            marginHorizontal: 32,
+            color: "black",
+          }}
+        >
+          Turn moments into mesmerizing grainy gradients
+        </ThemedText>
       </ThemedView>
     </GestureDetector>
   );
