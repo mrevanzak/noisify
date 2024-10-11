@@ -28,7 +28,8 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.ACCESS_MEDIA_LOCATION"
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.RECORD_AUDIO"
       ],
       "package": "com.mrevanzak.huelens"
     },
@@ -62,6 +63,12 @@
       "eas": {
         "projectId": "4548f797-7106-4030-b88f-6a259230b2b6"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4548f797-7106-4030-b88f-6a259230b2b6"
     }
   }
 }
