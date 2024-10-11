@@ -18,7 +18,7 @@ export type CameraRef = VisionCamera;
 
 export const Camera = forwardRef<
   VisionCamera,
-  Omit<CameraProps, "isActive" | "zoom"> & { zoom: SharedValue<number> }
+  Omit<CameraProps, "zoom"> & { zoom: SharedValue<number> }
 >(({ device, zoom, ...props }, ref) => {
   const animatedProps = useAnimatedProps<CameraProps>(
     () => ({ zoom: zoom.value }),
@@ -31,7 +31,6 @@ export const Camera = forwardRef<
       ref={ref}
       style={StyleSheet.absoluteFill}
       device={device}
-      isActive={true}
       animatedProps={animatedProps}
     />
   );

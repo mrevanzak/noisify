@@ -52,7 +52,8 @@
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
           "isAccessMediaLocationEnabled": true
         }
-      ]
+      ],
+      "expo-image-picker"
     ],
     "experiments": {
       "typedRoutes": true

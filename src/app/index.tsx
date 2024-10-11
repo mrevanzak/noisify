@@ -18,6 +18,8 @@ import {
   Paint,
   rect,
   rrect,
+  useImage,
+  Image,
 } from "@shopify/react-native-skia";
 import { useZoomGesture } from "@/hooks/useZoomGesture";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -37,9 +39,11 @@ import { captureRef } from "react-native-view-shot";
 import { toast, setup as toastSetup } from "@baronha/ting";
 import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
 import { ActionButtons } from "@/components/ActionButtons";
+import { useImagePickerStore } from "@/stores/useImagePickerStore";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
+const OFFSET = 300;
 
 toastSetup({
   toast: {
@@ -49,6 +53,10 @@ toastSetup({
 
 export default function Homescreen() {
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const selectedImage = useImagePickerStore((s) => s.imageUri);
+  const setImage = useImagePickerStore((s) => s.setImageUri);
+
+  const image = useImage(selectedImage);
 
   const controllCenterRef = useRef<BottomSheet>(null);
 
@@ -93,15 +101,13 @@ export default function Homescreen() {
   }, []);
 
   function onStartPress() {
-    const offset = 300;
-
     rShapeWidth.value = match(isFullScreen)
       .with(true, () => withTiming(SHAPE_WIDTH, { duration: 500 }))
-      .with(false, () => withTiming(SCREEN_WIDTH + offset, { duration: 1000 }))
+      .with(false, () => withTiming(SCREEN_WIDTH + OFFSET, { duration: 1000 }))
       .exhaustive();
     rShapeHeight.value = match(isFullScreen)
       .with(true, () => withTiming(SHAPE_HEIGHT, { duration: 500 }))
-      .with(false, () => withTiming(SCREEN_HEIGHT + offset, { duration: 1000 }))
+      .with(false, () => withTiming(SCREEN_HEIGHT + OFFSET, { duration: 1000 }))
       .exhaustive();
     opacity.value = withTiming(isFullScreen ? 1 : 0, {
       duration: 500,
@@ -169,6 +175,7 @@ export default function Homescreen() {
                 device={device}
                 zoom={zoom}
                 frameProcessor={frameProcessor}
+                isActive={!selectedImage}
               />
             ))
             .exhaustive()}
@@ -177,11 +184,28 @@ export default function Homescreen() {
             <Group
               clip={ovalRect}
               invertClip={true}
-              layer={
-                <Paint>
-                  <Blur blur={50} />
-                </Paint>
-              }
+              layer={match(selectedImage)
+                .with(
+                  P.string,
+                  () => !!image,
+                  () => (
+                    <Image
+                      image={image!}
+                      x={-(OFFSET / 2)}
+                      y={-(OFFSET / 2)}
+                      width={SCREEN_WIDTH + OFFSET}
+                      height={SCREEN_HEIGHT + OFFSET}
+                      fit="cover"
+                    >
+                      <Blur blur={50} />
+                    </Image>
+                  ),
+                )
+                .otherwise(() => (
+                  <Paint>
+                    <Blur blur={50} />
+                  </Paint>
+                ))}
             >
               <Fill color="white" />
             </Group>
@@ -206,7 +230,12 @@ export default function Homescreen() {
           mainAction={() => {
             isFullScreen ? onShutterPress() : onStartPress();
           }}
-          backAction={() => onStartPress()}
+          backAction={() => {
+            if (selectedImage) {
+              setImage(null);
+            }
+            onStartPress();
+          }}
         />
 
         <ControlCenter ref={controllCenterRef} />

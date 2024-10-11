@@ -1,3 +1,4 @@
+import * as ImagePicker from "expo-image-picker";
 import {
   FadeOut,
   BounceInLeft,
@@ -16,6 +17,7 @@ import {
 import { ThemedView } from "./ThemedView";
 import { AnimatedButton } from "./AnimatedButton";
 import { ThemedText } from "./ThemedText";
+import { useImagePickerStore } from "@/stores/useImagePickerStore";
 
 const iconProps: IconProps = {
   size: 24,
@@ -35,6 +37,18 @@ export function ActionButtons({
   backAction,
 }: ActionButtonsProps) {
   const { bottom } = useSafeAreaInsets();
+
+  const setImage = useImagePickerStore((s) => s.setImageUri);
+  async function onGalleryImportPress() {
+    const selectedImage = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (selectedImage.assets?.[0]?.uri) {
+      setImage(selectedImage.assets[0].uri);
+    }
+  }
 
   return (
     <ThemedView
@@ -97,6 +111,7 @@ export function ActionButtons({
             padding: 16,
             borderRadius: 1000,
           }}
+          onPress={onGalleryImportPress}
         >
           <GalleryImport {...iconProps} />
         </AnimatedButton>
