@@ -27,31 +27,28 @@ import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSh
 import { useSwipeUpGesture } from "@/hooks/useSwipeUpGesture";
 import {
   useDerivedValue,
-  withTiming,
   useSharedValue,
-  LinearTransition,
+  withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  SCREEN_HEIGHT,
-  SCREEN_WIDTH,
-  TouchableOpacity,
-} from "@gorhom/bottom-sheet";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import { paint } from "@/assets/shaders";
-import { Feather } from "@expo/vector-icons";
 import { usePermissions } from "@/hooks/usePermissions";
 import { captureRef } from "react-native-view-shot";
-import { toast } from "@baronha/ting";
+import { toast, setup as toastSetup } from "@baronha/ting";
 import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
-import { AnimatedButton } from "@/components/AnimatedButton";
+import { ActionButtons } from "@/components/ActionButtons";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
 
+toastSetup({
+  toast: {
+    backgroundColor: "#000000",
+  },
+});
+
 export default function Homescreen() {
   const [isFullScreen, setIsFullScreen] = useState(false);
-
-  const { bottom } = useSafeAreaInsets();
 
   const controllCenterRef = useRef<BottomSheet>(null);
 
@@ -98,14 +95,14 @@ export default function Homescreen() {
   function onStartPress() {
     const offset = 300;
 
-    rShapeWidth.value = withTiming(
-      isFullScreen ? SHAPE_WIDTH : SCREEN_WIDTH + offset,
-      { duration: 1000 },
-    );
-    rShapeHeight.value = withTiming(
-      isFullScreen ? SHAPE_HEIGHT : SCREEN_HEIGHT + offset,
-      { duration: 1000 },
-    );
+    rShapeWidth.value = match(isFullScreen)
+      .with(true, () => withTiming(SHAPE_WIDTH, { duration: 500 }))
+      .with(false, () => withTiming(SCREEN_WIDTH + offset, { duration: 1000 }))
+      .exhaustive();
+    rShapeHeight.value = match(isFullScreen)
+      .with(true, () => withTiming(SHAPE_HEIGHT, { duration: 500 }))
+      .with(false, () => withTiming(SCREEN_HEIGHT + offset, { duration: 1000 }))
+      .exhaustive();
     opacity.value = withTiming(isFullScreen ? 1 : 0, {
       duration: 500,
     });
@@ -117,23 +114,37 @@ export default function Homescreen() {
       requestLibraryPermission();
 
       const { granted } = await MediaLibrary.getPermissionsAsync();
-      if (!granted) return;
+      if (!granted) {
+        toast({
+          preset: "error",
+          title: "Need library permission",
+          haptic: "error",
+        });
+        return;
+      }
     }
 
     toast({
       title: "Saving...",
-      backgroundColor: "#000000",
       preset: "spinner",
     });
 
-    const captured = await captureRef(viewRef);
+    try {
+      const captured = await captureRef(viewRef);
+      await MediaLibrary.saveToLibraryAsync(`file://${captured}`);
 
-    await MediaLibrary.saveToLibraryAsync(`file://${captured}`);
-    toast({
-      title: "Saved to Library",
-      haptic: "success",
-      backgroundColor: "#000000",
-    });
+      toast({
+        title: "Saved to Library",
+        haptic: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Failed to save",
+        preset: "error",
+        haptic: "error",
+      });
+    }
   }
 
   return (
@@ -190,57 +201,13 @@ export default function Homescreen() {
           Turn Moments into Mesmerizing Grainy Gradients
         </ThemedText>
 
-        {isFullScreen ? (
-          <ThemedView
-            style={{
-              flexDirection: "row",
-              position: "absolute",
-              bottom: bottom + 64,
-              backgroundColor: "transparent",
-              gap: 16,
-            }}
-          >
-            <AnimatedButton
-              style={{
-                backgroundColor: "black",
-                padding: 16,
-                borderRadius: 50,
-              }}
-              onPress={onStartPress}
-            >
-              <Feather name="corner-up-left" size={24} color="white" />
-            </AnimatedButton>
-
-            <AnimatedButton
-              style={{
-                backgroundColor: "black",
-                padding: 16,
-                borderRadius: 50,
-              }}
-              onPress={onShutterPress}
-            >
-              <ThemedText>📸</ThemedText>
-            </AnimatedButton>
-          </ThemedView>
-        ) : (
-          <AnimatedButton
-            layout={LinearTransition}
-            style={{
-              width: "80%",
-              position: "absolute",
-              backgroundColor: "black",
-              paddingVertical: 16,
-              paddingHorizontal: 32,
-              borderRadius: 50,
-              bottom: bottom + 64,
-            }}
-            onPress={onStartPress}
-          >
-            <ThemedText style={{ textAlign: "center" }}>
-              ✨ Start the Experience
-            </ThemedText>
-          </AnimatedButton>
-        )}
+        <ActionButtons
+          isSplitted={isFullScreen}
+          mainAction={() => {
+            isFullScreen ? onShutterPress() : onStartPress();
+          }}
+          backAction={() => onStartPress()}
+        />
 
         <ControlCenter ref={controllCenterRef} />
       </ThemedView>
