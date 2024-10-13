@@ -196,9 +196,8 @@ export default function Homescreen() {
                       width={SCREEN_WIDTH + OFFSET}
                       height={SCREEN_HEIGHT + OFFSET}
                       fit="cover"
-                    >
-                      <Blur blur={50} />
-                    </Image>
+                      paint={paint}
+                    />
                   ),
                 )
                 .otherwise(() => (
