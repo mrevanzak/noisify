@@ -40,6 +40,7 @@ import { toast, setup as toastSetup } from "@baronha/ting";
 import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
 import { ActionButtons } from "@/components/ActionButtons";
 import { useImagePickerStore } from "@/stores/useImagePickerStore";
+import { useCameraStore } from "@/stores/useCameraStore";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
@@ -60,6 +61,7 @@ export default function Homescreen() {
 
   const controllCenterRef = useRef<BottomSheet>(null);
 
+  const setCameraReady = useCameraStore((s) => s.setReady);
   const viewRef = useRef<AnimatedView>(null);
   const [camera, setCamera] = useState<CameraPosition>("back");
   const device = useCameraDevice(camera);
@@ -172,6 +174,7 @@ export default function Homescreen() {
             ))
             .with([true, P.not(P.nullish)], ([_, device]) => (
               <Camera
+                onInitialized={() => setCameraReady()}
                 device={device}
                 zoom={zoom}
                 frameProcessor={frameProcessor}

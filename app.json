@@ -4,7 +4,7 @@
     "slug": "noisify",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
+    "icon": "./src/assets/images/icon.jpg",
     "scheme": "noisify",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -20,8 +20,9 @@
       "bundleIdentifier": "com.mrevanzak.noisify"
     },
     "android": {
+      "icon": "./src/assets/images/icon.jpg",
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/icon.jpg",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -36,7 +37,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./src/assets/images/favicon.png"
+      "favicon": "./src/assets/images/icon.jpg"
     },
     "plugins": [
       "expo-router",
