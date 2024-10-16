@@ -164,81 +164,83 @@ export default function Homescreen() {
           alignItems: "center",
         }}
       >
-        <View ref={viewRef} style={StyleSheet.absoluteFill}>
-          {match([hasCameraPermission, device])
-            .with([false, P._], () => (
-              <ThemedText>Camera permission is not granted</ThemedText>
-            ))
-            .with([P._, P.nullish], () => (
-              <ThemedText>Camera not available</ThemedText>
-            ))
-            .with([true, P.not(P.nullish)], ([_, device]) => (
-              <Camera
-                onInitialized={() => setCameraReady()}
-                device={device}
-                zoom={zoom}
-                frameProcessor={frameProcessor}
-                isActive={!selectedImage}
+        {match([hasCameraPermission, device])
+          .with([false, P._], () => (
+            <ThemedText>Camera permission is not granted</ThemedText>
+          ))
+          .with([P._, P.nullish], () => (
+            <ThemedText>Camera not available</ThemedText>
+          ))
+          .with([true, P.not(P.nullish)], ([_, device]) => (
+            <>
+              <View ref={viewRef} style={StyleSheet.absoluteFill}>
+                <Camera
+                  onInitialized={() => setCameraReady()}
+                  device={device}
+                  zoom={zoom}
+                  frameProcessor={frameProcessor}
+                  isActive={!selectedImage}
+                />
+
+                <Canvas style={StyleSheet.absoluteFill}>
+                  <Group
+                    clip={ovalRect}
+                    invertClip={true}
+                    layer={match(selectedImage)
+                      .with(
+                        P.string,
+                        () => !!image,
+                        () => (
+                          <Image
+                            image={image!}
+                            x={-(OFFSET / 2)}
+                            y={-(OFFSET / 2)}
+                            width={SCREEN_WIDTH + OFFSET}
+                            height={SCREEN_HEIGHT + OFFSET}
+                            fit="cover"
+                            paint={paint}
+                          />
+                        ),
+                      )
+                      .otherwise(() => (
+                        <Paint>
+                          <Blur blur={50} />
+                        </Paint>
+                      ))}
+                  >
+                    <Fill color="white" />
+                  </Group>
+                </Canvas>
+              </View>
+
+              <ThemedText
+                style={{
+                  textAlign: "center",
+                  fontSize: 40,
+                  lineHeight: 36,
+                  marginHorizontal: 32,
+                  color: "black",
+                  opacity,
+                }}
+              >
+                Turn Moments into Mesmerizing Grainy Gradients
+              </ThemedText>
+
+              <ActionButtons
+                isSplitted={isFullScreen}
+                mainAction={() => {
+                  isFullScreen ? onShutterPress() : onStartPress();
+                }}
+                backAction={() => {
+                  if (selectedImage) {
+                    setImage(null);
+                  }
+                  onStartPress();
+                }}
               />
-            ))
-            .exhaustive()}
-
-          <Canvas style={StyleSheet.absoluteFill}>
-            <Group
-              clip={ovalRect}
-              invertClip={true}
-              layer={match(selectedImage)
-                .with(
-                  P.string,
-                  () => !!image,
-                  () => (
-                    <Image
-                      image={image!}
-                      x={-(OFFSET / 2)}
-                      y={-(OFFSET / 2)}
-                      width={SCREEN_WIDTH + OFFSET}
-                      height={SCREEN_HEIGHT + OFFSET}
-                      fit="cover"
-                      paint={paint}
-                    />
-                  ),
-                )
-                .otherwise(() => (
-                  <Paint>
-                    <Blur blur={50} />
-                  </Paint>
-                ))}
-            >
-              <Fill color="white" />
-            </Group>
-          </Canvas>
-        </View>
-
-        <ThemedText
-          style={{
-            textAlign: "center",
-            fontSize: 40,
-            lineHeight: 36,
-            marginHorizontal: 32,
-            color: "black",
-            opacity,
-          }}
-        >
-          Turn Moments into Mesmerizing Grainy Gradients
-        </ThemedText>
-
-        <ActionButtons
-          isSplitted={isFullScreen}
-          mainAction={() => {
-            isFullScreen ? onShutterPress() : onStartPress();
-          }}
-          backAction={() => {
-            if (selectedImage) {
-              setImage(null);
-            }
-            onStartPress();
-          }}
-        />
+            </>
+          ))
+          .exhaustive()}
 
         <ControlCenter ref={controllCenterRef} />
       </ThemedView>
