@@ -36,7 +36,7 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import { paint } from "@/assets/shaders";
 import { usePermissions } from "@/hooks/usePermissions";
 import { captureRef } from "react-native-view-shot";
-import { toast, setup as toastSetup } from "@baronha/ting";
+import { toast } from "@baronha/ting";
 import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
 import { ActionButtons } from "@/components/ActionButtons";
 import { useImagePickerStore } from "@/stores/useImagePickerStore";
@@ -45,12 +45,6 @@ import { useCameraStore } from "@/stores/useCameraStore";
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
 const OFFSET = 300;
-
-toastSetup({
-  toast: {
-    backgroundColor: "#000000",
-  },
-});
 
 export default function Homescreen() {
   const [isFullScreen, setIsFullScreen] = useState(false);

@@ -11,6 +11,13 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { StatusBar } from "expo-status-bar";
 import { AnimatedSplashScreen } from "@/components/AnimatedSplashScreen";
 import { useState } from "react";
+import { setup } from "@baronha/ting";
+
+setup({
+  toast: {
+    backgroundColor: "#000000",
+  },
+});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
