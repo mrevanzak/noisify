@@ -77,4 +77,4 @@ const grainyBlurFilter = Skia.ImageFilter.MakeRuntimeShader(
 const paint = Skia.Paint();
 paint.setImageFilter(grainyBlurFilter);
 
-export { paint };
+export { paint, shaderBuilder };

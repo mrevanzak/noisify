@@ -33,7 +33,6 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
-import { paint } from "@/assets/shaders";
 import { usePermissions } from "@/hooks/usePermissions";
 import { captureRef } from "react-native-view-shot";
 import { toast } from "@baronha/ting";
@@ -41,6 +40,7 @@ import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2
 import { ActionButtons } from "@/components/ActionButtons";
 import { useImagePickerStore } from "@/stores/useImagePickerStore";
 import { useCameraStore } from "@/stores/useCameraStore";
+import { useGrainyBlurShader } from "@/hooks/useGrainyBlurShader";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
@@ -91,10 +91,14 @@ export default function Homescreen() {
     ),
   );
 
-  const frameProcessor = useSkiaFrameProcessor((frame) => {
-    "worklet";
-    frame.render(paint);
-  }, []);
+  const paint = useGrainyBlurShader();
+  const frameProcessor = useSkiaFrameProcessor(
+    (frame) => {
+      "worklet";
+      frame.render(paint);
+    },
+    [paint],
+  );
 
   function onStartPress() {
     rShapeWidth.value = match(isFullScreen)

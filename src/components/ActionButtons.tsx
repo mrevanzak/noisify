@@ -12,18 +12,12 @@ import {
   Back,
   GalleryImport,
   Camera as CameraIcon,
-  IconProps,
 } from "iconsax-react-native";
 import { ThemedView } from "./ThemedView";
 import { AnimatedButton } from "./AnimatedButton";
 import { ThemedText } from "./ThemedText";
 import { useImagePickerStore } from "@/stores/useImagePickerStore";
-
-const iconProps: IconProps = {
-  size: 24,
-  color: "white",
-  variant: "TwoTone",
-};
+import { iconProps } from "@/utils/icon";
 
 type ActionButtonsProps = {
   isSplitted: boolean;
