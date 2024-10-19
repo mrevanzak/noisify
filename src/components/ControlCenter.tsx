@@ -7,7 +7,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { forwardRef, useMemo, useRef } from "react";
 import { useControlCenterStore } from "@/stores/useControlCenterStore";
-import { Blur, Wind2 } from "iconsax-react-native";
+import { Blur, Colorfilter, Wind2 } from "iconsax-react-native";
 import { ThemedText } from "./ThemedText";
 import { iconProps } from "@/utils/icon";
 
@@ -24,6 +24,9 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
       useControlCenterStore.getState().noiseStrength,
     );
     const setNoiseStrength = useControlCenterStore((s) => s.setNoiseStrength);
+
+    const saturation = useRef(useControlCenterStore.getState().saturation);
+    const setSaturation = useControlCenterStore((s) => s.setSaturation);
 
     return (
       //TODO: fix modal auto close when use the slider for the very first time
@@ -54,7 +57,7 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
             >
-              <View style={{ gap: 8, flexDirection: "row", width: 70 }}>
+              <View style={{ gap: 8, flexDirection: "row", width: 100 }}>
                 <Blur {...iconProps} />
                 <ThemedText style={{ color: "white" }}>Blur</ThemedText>
               </View>
@@ -64,7 +67,7 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
                 value={blur.current}
                 onValueChange={(value) => setBlur(value)}
                 minimumValue={30}
-                maximumValue={120}
+                maximumValue={150}
                 step={1}
                 minimumTrackTintColor="#FFFFFF"
                 maximumTrackTintColor="#000000"
@@ -74,7 +77,7 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
             >
-              <View style={{ gap: 8, flexDirection: "row", width: 70 }}>
+              <View style={{ gap: 8, flexDirection: "row", width: 100 }}>
                 <Wind2 {...iconProps} />
                 <ThemedText style={{ color: "white" }}>Noise</ThemedText>
               </View>
@@ -86,6 +89,26 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
                 minimumValue={0.1}
                 maximumValue={0.5}
                 step={0.01}
+                minimumTrackTintColor="#FFFFFF"
+                maximumTrackTintColor="#000000"
+              />
+            </View>
+
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+            >
+              <View style={{ gap: 8, flexDirection: "row", width: 100 }}>
+                <Colorfilter {...iconProps} />
+                <ThemedText style={{ color: "white" }}>Saturation</ThemedText>
+              </View>
+
+              <Slider
+                style={{ flex: 1 }}
+                value={saturation.current}
+                onValueChange={(value) => setSaturation(value)}
+                minimumValue={1}
+                maximumValue={5}
+                step={0.1}
                 minimumTrackTintColor="#FFFFFF"
                 maximumTrackTintColor="#000000"
               />

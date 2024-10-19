@@ -6,14 +6,16 @@ import { shaderBuilder } from "@/assets/shaders";
 export function useGrainyBlurShader() {
   const blur = useControlCenterStore((state) => state.blur);
   const noiseStrength = useControlCenterStore((state) => state.noiseStrength);
+  const saturation = useControlCenterStore((state) => state.saturation);
 
   return useMemo(() => {
     shaderBuilder.setUniform("noiseStrength", [noiseStrength]); // Set the noise strength
+    shaderBuilder.setUniform("saturation", [saturation]); // Set the saturation factor
 
     const blurFilter = Skia.ImageFilter.MakeBlur(
       blur,
       blur,
-      TileMode.Repeat,
+      TileMode.Mirror,
       null,
     );
     const grainyBlurFilter = Skia.ImageFilter.MakeRuntimeShader(
@@ -26,5 +28,5 @@ export function useGrainyBlurShader() {
     paint.setImageFilter(grainyBlurFilter);
 
     return paint;
-  }, [blur, noiseStrength]);
+  }, [blur, noiseStrength, saturation]);
 }
