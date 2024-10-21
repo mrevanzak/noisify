@@ -12,17 +12,6 @@ export type ThemedViewProps = AnimatedProps<ViewProps> & {
 
 export const ThemedView = forwardRef<AnimatedView, ThemedViewProps>(
   ({ style, lightColor, darkColor, ...otherProps }, ref) => {
-    const backgroundColor = useThemeColor(
-      { light: lightColor, dark: darkColor },
-      "background",
-    );
-
-    return (
-      <Animated.View
-        ref={ref}
-        style={[{ backgroundColor }, style]}
-        {...otherProps}
-      />
-    );
-  },
+    return <Animated.View ref={ref} style={[style]} {...otherProps} />;
+  }
 );
