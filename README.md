@@ -1,50 +1,58 @@
-# Welcome to your Expo app 👋
+<img width="64" src="https://github.com/mrevanzak/noisify/blob/main/src/assets/images/icon.png" align="left" />
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Noisify** is an app to turn your favorite photo into a stunning wallpaper. Just snap a pic with your camera and let our app add a beautiful gradient and some cool noise effects. It’s like magic!
 
-## Get started
+![noisify](https://github.com/user-attachments/assets/b15e8533-289a-4911-b434-0c52ab90d5b9)
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+## How it works
+Noisify uses [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera) to display a Camera preview.
 
-2. Start the app
+Using the VisionCamera's [Frame Processors](https://react-native-vision-camera.com/docs/guides/frame-processors) API the VisionCamera's [Skia Frame Processors](https://react-native-vision-camera.com/docs/guides/skia-frame-processors) integration, we can draws 2d graphics (in this case blur and noisy filter) directly to Camera Frames in realtime at 60 FPS.
 
-   ```bash
-    npx expo start
-   ```
+This is the relevant code:
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```ts
+  const paint = useGrainyBlurShader();
+  const frameProcessor = useSkiaFrameProcessor(
+    (frame) => {
+      "worklet";
+      frame.render(paint);
+    },
+    [paint],
+  );
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```ts
+export function useGrainyBlurShader() {
+  const blur = useControlCenterStore((state) => state.blur);
+  const noiseStrength = useControlCenterStore((state) => state.noiseStrength);
+  const saturation = useControlCenterStore((state) => state.saturation);
 
-## Learn more
+  return useMemo(() => {
+    shaderBuilder.setUniform("noiseStrength", [noiseStrength]); // Set the noise strength
+    shaderBuilder.setUniform("saturation", [saturation]); // Set the saturation factor
 
-To learn more about developing your project with Expo, look at the following resources:
+    const blurFilter = Skia.ImageFilter.MakeBlur(
+      blur,
+      blur,
+      TileMode.Mirror,
+      null,
+    );
+    const grainyBlurFilter = Skia.ImageFilter.MakeRuntimeShader(
+      shaderBuilder,
+      null,
+      blurFilter,
+    );
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+    const paint = Skia.Paint();
+    paint.setImageFilter(grainyBlurFilter);
 
-## Join the community
+    return paint;
+  }, [blur, noiseStrength, saturation]);
+}
+```
 
-Join our community of developers creating universal apps.
+> See [`index.tsx`](https://github.com/mrevanzak/noisify/blob/main/src/app/index.tsx) for the full code.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 
