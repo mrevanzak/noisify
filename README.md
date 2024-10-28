@@ -8,7 +8,7 @@
 ## How it works
 Noisify uses [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera) to display a Camera preview.
 
-Using the VisionCamera's [Frame Processors](https://react-native-vision-camera.com/docs/guides/frame-processors) API the VisionCamera's [Skia Frame Processors](https://react-native-vision-camera.com/docs/guides/skia-frame-processors) integration, we can draws 2d graphics (in this case blur and noisy filter) directly to Camera Frames in realtime at 60 FPS.
+Using the VisionCamera's [Frame Processors](https://react-native-vision-camera.com/docs/guides/frame-processors) API and the VisionCamera's [Skia Frame Processors](https://react-native-vision-camera.com/docs/guides/skia-frame-processors) integration, we can draws 2d graphics (in this case blur and noisy filter) directly to Camera Frames in realtime at 60 FPS.
 
 This is the relevant code:
 
