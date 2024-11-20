@@ -4,6 +4,8 @@
 
 ![noisify](https://github.com/user-attachments/assets/b15e8533-289a-4911-b434-0c52ab90d5b9)
 
+> [DEMO](https://www.linkedin.com/posts/rev1006_reactnative-mobiledevelopment-expo-activity-7250746795763326976-0TsM?utm_source=share&utm_medium=member_desktop)
+
 
 ## How it works
 Noisify uses [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera) to display a Camera preview.
