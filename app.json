@@ -15,9 +15,11 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
+        "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.mrevanzak.noisify"
+      "bundleIdentifier": "app.mrevanzak.noisify",
+      "appleTeamId": "5U7DSB32K6"
     },
     "android": {
       "icon": "./src/assets/images/icon.png",
@@ -32,7 +34,7 @@
         "android.permission.ACCESS_MEDIA_LOCATION",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.mrevanzak.noisify"
+      "package": "app.mrevanzak.noisify"
     },
     "web": {
       "bundler": "metro",
