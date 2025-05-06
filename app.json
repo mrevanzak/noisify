@@ -15,7 +15,6 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "app.mrevanzak.noisify",
@@ -46,15 +45,15 @@
       [
         "react-native-vision-camera",
         {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
+          "cameraPermissionText": "$(PRODUCT_NAME) uses your camera to capture real-world scenes and magically create custom wallpapers based on your environment."
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
-          "isAccessMediaLocationEnabled": true
+          "photosPermission": "$(PRODUCT_NAME) needs access to your photo library to let you choose a favorite photo and turn it into a stunning wallpaper.",
+          "savePhotosPermission": "$(PRODUCT_NAME) saves generated wallpapers to your photo library for easy access.",
+          "isAccessMediaLocationEnabled": false
         }
       ],
       "expo-image-picker",
