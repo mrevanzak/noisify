@@ -12,12 +12,15 @@ import { StatusBar } from "expo-status-bar";
 import { AnimatedSplashScreen } from "@/components/AnimatedSplashScreen";
 import { useState } from "react";
 import { setup } from "@baronha/ting";
+import { Appearance } from "react-native";
 
 setup({
   toast: {
     backgroundColor: "#000000",
   },
 });
+
+Appearance.setColorScheme('dark')
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
