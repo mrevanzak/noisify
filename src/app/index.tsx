@@ -1,46 +1,47 @@
+import { ActionButtons } from "@/components/ActionButtons";
+import { AnimatedButton } from "@/components/AnimatedButton";
+import { Camera } from "@/components/Camera";
+import { ControlCenter } from "@/components/ControlCenter";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import {
-  CameraPosition,
-  useCameraDevice,
-  useSkiaFrameProcessor,
-} from "react-native-vision-camera";
-import * as MediaLibrary from "expo-media-library";
-import { Camera } from "@/components/Camera";
-import { StyleSheet, View } from "react-native";
-import { P, match } from "ts-pattern";
-import { useRef, useState } from "react";
+import { useDoubleTapGesture } from "@/hooks/useDoubleTapGesture";
+import { useGrainyBlurShader } from "@/hooks/useGrainyBlurShader";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useSwipeUpGesture } from "@/hooks/useSwipeUpGesture";
+import { useZoomGesture } from "@/hooks/useZoomGesture";
+import { useCameraStore } from "@/stores/useCameraStore";
+import { useImagePickerStore } from "@/stores/useImagePickerStore";
+import { toast } from "@baronha/ting";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
+import type BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
 import {
   Blur,
   Canvas,
   Fill,
   Group,
+  Image,
   Paint,
   rect,
   rrect,
   useImage,
-  Image,
 } from "@shopify/react-native-skia";
-import { useZoomGesture } from "@/hooks/useZoomGesture";
+import * as MediaLibrary from "expo-media-library";
+import { useRef, useState } from "react";
+import { Linking, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { useDoubleTapGesture } from "@/hooks/useDoubleTapGesture";
-import { ControlCenter } from "@/components/ControlCenter";
-import BottomSheet from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet";
-import { useSwipeUpGesture } from "@/hooks/useSwipeUpGesture";
 import {
   useDerivedValue,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@gorhom/bottom-sheet";
-import { usePermissions } from "@/hooks/usePermissions";
+import type { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
 import { captureRef } from "react-native-view-shot";
-import { toast } from "@baronha/ting";
-import { AnimatedView } from "react-native-reanimated/lib/typescript/reanimated2/component/View";
-import { ActionButtons } from "@/components/ActionButtons";
-import { useImagePickerStore } from "@/stores/useImagePickerStore";
-import { useCameraStore } from "@/stores/useCameraStore";
-import { useGrainyBlurShader } from "@/hooks/useGrainyBlurShader";
+import {
+  type CameraPosition,
+  useCameraDevice,
+  useSkiaFrameProcessor,
+} from "react-native-vision-camera";
+import { P, match } from "ts-pattern";
 
 const SHAPE_WIDTH = SCREEN_WIDTH * 0.9;
 const SHAPE_HEIGHT = (4 / 2.5) * SHAPE_WIDTH;
@@ -164,10 +165,37 @@ export default function Homescreen() {
       >
         {match([hasCameraPermission, device])
           .with([false, P._], () => (
-            <ThemedText>Camera permission is not granted</ThemedText>
+            <View style={{ gap: 16 }}>
+              <ThemedText
+                style={{
+                  color: "black",
+                }}
+              >
+                Camera permission is not granted
+              </ThemedText>
+              <AnimatedButton
+                style={{
+                  backgroundColor: "black",
+                  padding: 16,
+                  borderRadius: 1000,
+                  alignItems: "center",
+                }}
+                onPress={() => Linking.openSettings()}
+              >
+                <ThemedText style={{ color: "white" }}>
+                  Grant Permission
+                </ThemedText>
+              </AnimatedButton>
+            </View>
           ))
           .with([P._, P.nullish], () => (
-            <ThemedText>Camera not available</ThemedText>
+            <ThemedText
+              style={{
+                color: "black",
+              }}
+            >
+              Camera not available
+            </ThemedText>
           ))
           .with([true, P.not(P.nullish)], ([_, device]) => (
             <>
@@ -190,7 +218,7 @@ export default function Homescreen() {
                         () => !!image,
                         () => (
                           <Image
-                            image={image!}
+                            image={image}
                             x={-(OFFSET / 2)}
                             y={-(OFFSET / 2)}
                             width={SCREEN_WIDTH + OFFSET}
