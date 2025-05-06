@@ -29,7 +29,6 @@ export const ControlCenter = forwardRef<BottomSheet, ControlCenterProps>(
     const setSaturation = useControlCenterStore((s) => s.setSaturation);
 
     return (
-      //TODO: fix modal auto close when use the slider for the very first time
       <BottomSheet
         {...props}
         ref={ref}
